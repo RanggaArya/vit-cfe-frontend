@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 // GANTI DENGAN URL API ENDPOINT GRADIO ANDA!
-const API_URL = "https://RanggaArya/ViT-Compound-Expression/predict";
+const API_URL = "https://ranggaarya-vit-compound-expression.hf.space/run/predict";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,7 +39,13 @@ function App() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            data: [base64Image] // API Gradio mengharapkan data dalam array
+            api_name: "/predict_and_visualize", 
+            data: [
+              {
+                "data": base64Image,
+                "name": selectedFile.name
+              }
+            ]
           })
         });
 
