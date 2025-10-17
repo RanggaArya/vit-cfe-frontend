@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 // GANTI DENGAN URL API ENDPOINT GRADIO ANDA!
-const API_URL = "https://RanggaArya-ViT-Compound-Expression.hf.space/run/predict_and_visualize";
+const API_URL = "https://RanggaArya-ViT-Compound-Expression.hf.space/run/predict";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
