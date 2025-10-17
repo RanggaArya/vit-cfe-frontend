@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
 
-// GANTI DENGAN URL API ENDPOINT GRADIO ANDA!
-const API_URL = "https://ranggaarya-vit-compound-expression.hf.space/run/predict";
+// URL API sekarang adalah 'asisten' lokal kita
+const API_URL = "/api/predict";
 
 function App() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -27,25 +27,16 @@ function App() {
     setIsLoading(true);
     setError(null);
 
-    // 1. Ubah file gambar menjadi format base64
     const reader = new FileReader();
     reader.readAsDataURL(selectedFile);
     reader.onload = async () => {
-      const base64Image = reader.result;
-
       try {
-        // 2. Kirim data ke API Hugging Face
         const response = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            api_name: "/predict_and_visualize", 
-            data: [
-              {
-                "data": base64Image,
-                "name": selectedFile.name
-              }
-            ]
+            image: reader.result, // Kirim base64 string
+            filename: selectedFile.name
           })
         });
 
@@ -53,13 +44,11 @@ function App() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
+        const resultData = await response.json();
 
-        // 3. Ambil hasil prediksi dari respons API
-        // Indeks [3] adalah output Markdown "Hasil Prediksi Akhir"
-        const predictionText = result.data[3];
+        // Ambil hasil dari respons 'asisten'
+        const predictionText = resultData[3]; // Output Markdown
 
-        // Ekstrak label dan confidence dari teks
         const predMatch = predictionText.match(/\*\*Prediction:\*\* (.*?)\n/);
         const confMatch = predictionText.match(/\*\*Confidence:\*\* ([\d.]+%)/);
 
@@ -67,7 +56,7 @@ function App() {
           setPrediction(predMatch[1]);
           setConfidence(confMatch[1]);
         } else {
-           setError("Gagal mem-parsing hasil prediksi dari API.");
+           setError("Gagal mem-parsing hasil prediksi.");
         }
 
       } catch (e) {
@@ -77,8 +66,7 @@ function App() {
         setIsLoading(false);
       }
     };
-    reader.onerror = (error) => {
-      console.error("Error reading file:", error);
+    reader.onerror = () => {
       setError("Gagal membaca file gambar.");
       setIsLoading(false);
     };
